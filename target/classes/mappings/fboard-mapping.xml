@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fboard-mapping">
+
+
+	<!-- 글등록 -->
+	<insert id="fboard_insert" parameterType="FboardVo">
+
+		insert into
+		food(fsno,ftitle,fcontent,fwriter,fimg,fbjoindate)
+		values(fm1.nextval,#{ftitle},#{fcontent},#{fwriter},#{fimg},#{fbjoindate})
+
+	</insert>
+	
+	
+	<insert id="saveinsert" parameterType="FboardVo" >
+	
+		insert into scrap(fsno,fcustno) values(#{fsno},#{fcustno})
+		
+	</insert>
+	
+	<select id="saveList" resultType="FboardVo">
+		select f.fsno,ftitle,fcontent,fwriter,fimg,fbjoindate,s.fcustno from food f join scrap s on f.fsno = s.fsno 
+	
+	</select>
+	
+	
+
+	<!-- 글목록보기 , 검색기능 -->
+	<select id="getfboardList" resultType="FboardVo">
+		select rownum , K.*
+		from( select rownum as rnum, k.*
+		from (select * from
+		food where 1=1
+		<if test="ch1 == 'ftitle'">
+			and ftitle like '%' || #{ch2} || '%'
+		</if>
+		<if test="ch1 == 'fwriter'">
+			and fwriter like '%' || #{ch2} || '%'
+		</if>
+		<![CDATA[
+		) k
+		where rownum <= #{startIdx}+9) K
+		where rnum >= #{startIdx}
+		]]>
+	</select>
+
+	<!-- 상세보기 -->
+	<select id="getfboard" resultType="FboardVo">
+	<![CDATA[
+		select * from food where fsno=#{fsno}
+	]]>
+	</select>
+
+	<!-- 업데이트 -->
+	<update id="fupdate" parameterType="FboardVo">
+
+		update food set ftitle=#{ftitle},fcontent=#{fcontent},fwriter=#{fwriter},fimg=#{fimg},fbjoindate=#{fbjoindate} where ftitle=#{ftitle}
+	</update>
+	
+	
+	<delete id="fdelete" parameterType="FboardVo">
+	
+		delete from food where fsno=#{fsno}
+	</delete>
+	
+	
+	<!-- 카운트 -->
+	<select id="fbcount" resultType="int">
+		select count(*) as fbcount from food
+		where 1=1
+		
+		<if test="ch1 == 'ftitle'">
+			and ftitle like '%'||#{ch2}||'%'
+		</if>
+		
+		<if test="ch1 =='fwriter'">
+			and fwriter like '%'||#{ch2}||'%'
+		</if>
+	 
+	</select>
+	
+	
+	
+	
+
+</mapper>

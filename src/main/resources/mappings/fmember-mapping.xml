@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fmember-mapping">
+	
+
+	<!-- 회원가입 -->
+	<insert id="insert_fmember" parameterType="FmemberVo">
+		insert into
+		fmember(fcustno,fid,fpwd,fname,fjender,fjoindate)
+		values(fmem_s.nextval,#{fid},#{fpwd},#{fname},#{fjender},#{fjoindate})
+	</insert>
+	
+	<select id="login_fmember" resultType="com.food.k1.fmember.FmemberVo">
+	
+		select * from fmember where fid=#{fid} and fpwd=#{fpwd}
+	
+	</select>
+	
+	
+	<!--회원목록보기 -->
+	<select id="select_fmember" resultType="FmemberVo">
+
+
+		select rownum , K.*
+		from( select rownum as rnum, k.*
+		from (select * from
+		fmember where 1=1
+		<if test="ch1 == 'fid'">
+			and fid like '%'||#{ch2}||'%'
+		</if>
+
+		<if test="ch1 == 'fname'">
+			and fname like '%'||#{ch2}||'%'
+		</if>
+		<![CDATA[
+		) k
+		where rownum <= #{startIdx}+9) K
+		where rnum >= #{startIdx}
+	]]>
+	</select>
+	<!-- 중복체크 -->
+	<select id="fck_fmember" resultType="FmemberVo">
+		select * from fmember
+		where fid=#{fid}
+	</select>
+	<!-- 상세보기 -->
+	<select id="content_fmember1" resultType="FmemberVo">
+		select * from fmember
+		where fid=#{fid} 
+	</select>
+
+	<!-- 삭제하기 -->
+	<delete id="delete_fmember" parameterType="FmemberVo">
+		delete from fmember
+		where fid=#{fid}
+	</delete>
+
+	<update id="fmember_update" parameterType="FmemberVo" >
+		update fmember set
+		fpwd=#{fpwd}, fname=#{fname}, fjender=#{fjender},
+		fjoindate=#{fjoindate} where fid = #{fid}
+	</update>
+
+
+	<select id="fmember_tc" resultType="int">
+		
+		select count(*) as totalcount from fmember
+		where 1=1
+		
+		<if test="ch1 == 'fid'">
+			and fid like '%'||#{ch2}||'%'
+		</if>
+		
+		<if test="ch1 =='fname'">
+			and fname like '%'||#{ch2}||'%'
+		</if>
+		
+	</select>
+
+
+
+</mapper>
